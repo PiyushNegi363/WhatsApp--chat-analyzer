@@ -1,0 +1,14 @@
+01/01/24, 10:00 - User1: Happy New Year everyone! 🎉
+01/01/24, 10:05 - User2: Happy New Year! Hope everyone has a great 2024.
+01/01/24, 10:10 - User3: Any plans for today?
+01/01/24, 10:15 - User1: Just relaxing at home.
+01/01/24, 11:00 - User2: <Media omitted>
+01/01/24, 11:05 - User2: Send me the links for the party.
+01/01/24, 11:10 - User1: https://example.com/party-details
+02/01/24, 09:00 - User3: Good morning! Back to work... 😅
+02/01/24, 09:30 - User2: Tell me about it. So many emails already.
+03/01/24, 14:00 - User1: 😂 check out this meme!
+03/01/24, 14:05 - User1: <Media omitted>
+04/01/24, 18:00 - User2: Are we still on for the weekend?
+04/01/24, 18:01 - User3: Yes! Looking forward to it.
+05/01/24, 20:00 - User1: See you all tomorrow then!
