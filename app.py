@@ -12,6 +12,7 @@ except ImportError:
     LOTTIE_AVAILABLE = False
 import pandas as pd
 import html
+import time
 
 # Page Configuration
 st.set_page_config(page_title="WhatsApp Pro Analyzer", page_icon="📈", layout="wide")
@@ -23,6 +24,7 @@ st.markdown("""
     
     :root {
         --primary: #22c55e;
+        --primary-hover: #16a34a;
         --primary-glow: rgba(34, 197, 94, 0.4);
         --bg: #020617;
         --card-bg: rgba(15, 23, 42, 0.6);
@@ -44,138 +46,116 @@ st.markdown("""
 
     /* --- Typography Hierarchy --- */
     h1 {
-        font-size: 32px !important;
-        font-weight: 700 !important;
-        line-height: 1.25 !important;
+        font-size: clamp(28px, 5vw, 40px) !important;
+        font-weight: 800 !important;
+        line-height: 1.1 !important;
         color: var(--text-high) !important;
-        letter-spacing: -0.5px !important;
-        margin-bottom: var(--spacing-lg) !important;
-        margin-top: var(--spacing-lg) !important;
+        letter-spacing: -1px !important;
+        margin-bottom: var(--spacing-md) !important;
+        background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     h2 {
-        font-size: 26px !important;
-        font-weight: 600 !important;
-        line-height: 1.35 !important;
+        font-size: clamp(22px, 4vw, 30px) !important;
+        font-weight: 700 !important;
         color: var(--text-high) !important;
-        letter-spacing: -0.3px !important;
-        margin-bottom: var(--spacing-md) !important;
         margin-top: var(--spacing-lg) !important;
+        border-left: 4px solid var(--primary);
+        padding-left: 15px;
     }
 
-    h3 {
-        font-size: 20px !important;
-        font-weight: 600 !important;
-        line-height: 1.4 !important;
-        color: var(--text-high) !important;
-        margin-bottom: var(--spacing-sm) !important;
-        margin-top: var(--spacing-md) !important;
+    /* --- Animations --- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    h4 {
-        font-size: 17px !important;
-        font-weight: 500 !important;
-        line-height: 1.5 !important;
-        color: var(--text-medium) !important;
-        margin-bottom: var(--spacing-xs) !important;
-    }
-
-    p, .stText, .stMarkdown {
-        font-size: 15px !important;
-        font-weight: 400 !important;
-        line-height: 1.6 !important;
-        color: var(--text-medium) !important;
-        max-width: 80ch;
-    }
-
-    .caption {
-        font-size: 12px !important;
-        font-weight: 300 !important;
-        color: var(--text-muted) !important;
-        letter-spacing: 0.2px;
+    .animate-in {
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* --- UI Components --- */
+    .hero-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
     .saas-card {
         background: var(--card-bg);
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
+        border-radius: 16px;
         padding: var(--spacing-md);
         margin-bottom: var(--spacing-md);
-        transition: all 0.2s ease-in-out;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .saas-card:hover {
-        border-color: rgba(37, 211, 102, 0.3);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        border-color: var(--primary);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
     }
 
     .metric-container {
-        padding: var(--spacing-sm);
-        text-align: center;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.02);
+        padding: var(--spacing-md);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
     
     .metric-label {
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 12px;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
         color: var(--text-muted);
-        margin-bottom: 4px;
+        letter-spacing: 1px;
     }
     
     .metric-value {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 700;
         color: var(--primary);
+        text-shadow: 0 0 20px var(--primary-glow);
     }
 
-    /* --- Sidebar --- */
+    /* --- Sidebar Enhancements --- */
     [data-testid="stSidebar"] {
-        background-color: #020617;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 2rem 1rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* --- Plotly --- */
-    .js-plotly-plot { background: transparent !important; }
+    .sidebar-logo {
+        font-size: 24px;
+        font-weight: 800;
+        background: linear-gradient(90deg, #22c55e, #4ade80);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 2rem;
+    }
 
-    /* --- Buttons & Inputs --- */
-    .stButton>button {
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-        padding: 8px 24px !important;
-        background-color: transparent !important;
-        border: 1px solid var(--primary) !important;
-        color: var(--primary) !important;
-        transition: 0.3s;
+    /* --- Mobile Fixes --- */
+    @media (max-width: 768px) {
+        .metric-value { font-size: 24px; }
+        .stColumns > div { margin-bottom: 20px; }
     }
-    
-    .stButton>button:hover {
-        background-color: var(--primary) !important;
-        color: #fff !important;
+
+    /* Better Tabs */
+    .stTabs [data-baseweb="tab-list"] { 
+        background-color: rgba(255, 255, 255, 0.03);
+        padding: 5px;
+        border-radius: 12px;
     }
-    
-    /* Tabs Styling */
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; }
     .stTabs [data-baseweb="tab"] {
-        background-color: transparent;
-        border-radius: 8px;
-        color: var(--text-muted);
-        padding: 8px 16px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: rgba(37, 211, 102, 0.1) !important;
-        color: var(--primary) !important;
-    }
-
-    /* Remove default red underline and replace with green */
-    .stTabs [data-baseweb="tab-highlight"] {
-        background-color: var(--primary) !important;
-        height: 2px !important;
+        padding: 10px 20px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -192,14 +172,14 @@ def styled_metric(label, value):
     safe_label = html.escape(str(label))
     safe_value = html.escape(str(value))
     st.markdown(f"""
-    <div class="metric-container">
+    <div class="metric-container animate-in" aria-label="{safe_label}: {safe_value}">
         <div class="metric-label">{safe_label}</div>
         <div class="metric-value">{safe_value}</div>
     </div>
     """, unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.markdown("# ChatPulse Pro")
+st.sidebar.markdown('<div class="sidebar-logo">ChatPulse Pro</div>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 app_mode = st.sidebar.radio("Analysis Mode", ["Upload Chat", "Try Sample Chat"])
@@ -213,26 +193,16 @@ if app_mode == "Upload Chat":
         try:
             bytes_data = uploaded_file.getvalue()
             data = bytes_data.decode("utf-8")
-            with st.status("Preprocessing Chat Data...", expanded=False) as status:
+            with st.status("Preprocessing Data...", expanded=False) as status:
                 df = preprocessor.preprocess(data)
                 if df.empty:
-                    status.update(label="Preprocessing Failed", state="error")
+                    status.update(label="Parsing Failed", state="error")
                     st.error("## 🔍 Parsing Failed")
                     st.warning("We couldn't detect a valid WhatsApp chat format. Please ensure you exported 'Without Media'.")
-                    
-                    with st.expander("Show Diagnostic Info (Technical)"):
-                        st.info("This snippet helps identify your specific device's export format:")
-                        st.code(data[:500] if data else "Empty File", language="text")
-                        st.markdown("""
-                        **Common issues:**
-                        - Exporting *with* media (unsupported).
-                        - Using a very rare system language.
-                        - File encoding issues (ChatPulse expected UTF-8).
-                        """)
                 else:
-                    status.update(label="Preprocessing Complete!", state="complete")
+                    status.update(label="Ready for Analysis", state="complete")
         except Exception as e:
-            st.error(f"Error loading file: {str(e)}")
+            st.sidebar.error(f"Error loading file: {str(e)}")
 else:
     try:
         with open('data/sample_chat.txt', 'r') as f:
@@ -251,195 +221,187 @@ if not df.empty:
 
     selected_user = st.sidebar.selectbox("Analysis Perspective", user_list)
     
-    if st.sidebar.button("Generate Dashboard"):
-        try:
-            with st.status("Analyzing Chat Trends...", expanded=False) as status:
-                st.write("Fetching Statistics...")
-                num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
-                
-                # --- Dashboard Rendering ---
-                st.title(f"Dashboard: {selected_user}")
-                
-                # Report Download
-                report_df = helper.generate_report_data(selected_user, df)
-                st.download_button(
-                    label="📥 Download Professional Report (CSV)",
-                    data=report_df.to_csv(index=False).encode('utf-8'),
-                    file_name=f"ChatPulse_{selected_user}_Report.csv",
-                    mime="text/csv",
-                    key="download-report"
-                )
+    # Automatic Generation Logic
+    if 'prev_user' not in st.session_state:
+        st.session_state.prev_user = None
+    
+    # We always analyze if we have data, but we use a status block just for the "heavy" lifting
+    try:
+        # Fetch stats once
+        num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+        
+        # --- Dashboard Rendering (OUTSIDE status block) ---
+        st.title(f"Dashboard: {selected_user}")
+        
+        # Action Bar
+        col_act1, col_act2 = st.columns([3, 1])
+        with col_act2:
+            report_df = helper.generate_report_data(selected_user, df)
+            st.download_button(
+                label="📥 Download CSV Report",
+                data=report_df.to_csv(index=False).encode('utf-8'),
+                file_name=f"ChatPulse_{selected_user}_Report.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
 
-                # Stats Area
-                st.markdown("## 🏆 Performance Overview")
-                c1, c2, c3, c4 = st.columns(4)
-                with c1: styled_metric("Messages", f"{num_messages:,}")
-                with c2: styled_metric("Total Words", f"{words:,}")
-                with c3: styled_metric("Media Shared", f"{num_media_messages:,}")
-                with c4: styled_metric("Links Shared", f"{num_links:,}")
-                
+        # 1. Performance Overview
+        st.markdown("## 🏆 Performance Overview")
+        m1, m2, m3, m4 = st.columns(4)
+        with m1: styled_metric("Messages", f"{num_messages:,}")
+        with m2: styled_metric("Total Words", f"{words:,}")
+        with m3: styled_metric("Media Shared", f"{num_media_messages:,}")
+        with m4: styled_metric("Links Shared", f"{num_links:,}")
 
-                st.write("Processing Timelines...")
-                # Timelines
-                st.markdown("## 📈 Engagement Timelines")
-                tab1, tab2 = st.tabs(["Monthly Velocity", "Daily Frequency"])
-                
-                with tab1:
-                    timeline = helper.monthly_timeline(selected_user, df)
-                    fig = px.line(timeline, x='time', y='message', 
-                                 hover_name='time', markers=True,
-                                 template="plotly_dark", color_discrete_sequence=['#25D366'])
-                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-                                      xaxis_title="Timeline", yaxis_title="Messages")
-                    st.plotly_chart(fig, use_container_width=True)
-                    
-                with tab2:
-                    daily_timeline = helper.daily_timeline(selected_user, df)
-                    fig = px.area(daily_timeline, x='only_date', y='message', 
-                                 template="plotly_dark", color_discrete_sequence=['#25D366'])
-                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-                                      xaxis_title="Date", yaxis_title="Messages")
-                    st.plotly_chart(fig, use_container_width=True)
-                
+        # 2. Activity Trends
+        st.markdown("## 📈 Engagement Timelines")
+        tab1, tab2 = st.tabs(["Monthly Velocity", "Daily Frequency"])
+        
+        with tab1:
+            timeline = helper.monthly_timeline(selected_user, df)
+            fig = px.line(timeline, x='time', y='message', 
+                         hover_name='time', markers=True,
+                         template="plotly_dark", color_discrete_sequence=['#22c55e'])
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                              margin=dict(l=0, r=0, t=20, b=0))
+            st.plotly_chart(fig, use_container_width=True)
+            
+        with tab2:
+            daily_timeline = helper.daily_timeline(selected_user, df)
+            fig = px.area(daily_timeline, x='only_date', y='message', 
+                         template="plotly_dark", color_discrete_sequence=['#22c55e'])
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                              margin=dict(l=0, r=0, t=20, b=0))
+            st.plotly_chart(fig, use_container_width=True)
 
-                # Activity Maps
-                st.write("Mapping Activity...")
-                st.markdown("## 🗓️ Activity Distribution")
-                colA, colB = st.columns(2)
-                
-                with colA:
-                    st.markdown("#### Weekly Intensity")
-                    busy_day = helper.week_activity_map(selected_user, df)
-                    fig = px.bar(busy_day, x='Day', y='Count', 
-                                template="plotly_dark", color_discrete_sequence=['#25D366'])
-                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                    st.plotly_chart(fig, use_container_width=True)
-                    
-                    
-                with colB:
-                    st.markdown("#### Monthly Volume")
-                    busy_month = helper.month_activity_map(selected_user, df)
-                    fig = px.bar(busy_month, x='Month', y='Count', 
-                                template="plotly_dark", color_discrete_sequence=['#25D366'])
-                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                    st.plotly_chart(fig, use_container_width=True)
-                    
+        # 3. Distribution Maps
+        st.markdown("## 🗓️ Activity Distribution")
+        colA, colB = st.columns(2)
+        
+        with colA:
+            st.markdown('<div class="saas-card"><h4>Weekly Intensity</h4>', unsafe_allow_html=True)
+            busy_day = helper.week_activity_map(selected_user, df)
+            fig = px.bar(busy_day, x='Day', y='Count', 
+                        template="plotly_dark", color_discrete_sequence=['#22c55e'])
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                              xaxis_title="", yaxis_title="")
+            st.plotly_chart(fig, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+        with colB:
+            st.markdown('<div class="saas-card"><h4>Monthly Volume</h4>', unsafe_allow_html=True)
+            busy_month = helper.month_activity_map(selected_user, df)
+            fig = px.bar(busy_month, x='Month', y='Count', 
+                        template="plotly_dark", color_discrete_sequence=['#22c55e'])
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                              xaxis_title="", yaxis_title="")
+            st.plotly_chart(fig, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-                st.markdown("#### 🕒 Weekly Pulse (Hourly)")
-                user_heatmap = helper.activity_heatmap(selected_user, df)
-                if not user_heatmap.empty:
-                    fig = px.imshow(user_heatmap, 
-                                    color_continuous_scale='Greens',
-                                    template="plotly_dark", aspect="auto")
-                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-                                      xaxis_type='category') # Force categorical to fix 11:59:59 issue
-                    st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("Insufficient data for activity pulse heatmap.")
-                
+        st.markdown("#### 🕒 Weekly Pulse (Hourly)")
+        user_heatmap = helper.activity_heatmap(selected_user, df)
+        if not user_heatmap.empty:
+            fig = px.imshow(user_heatmap, 
+                            color_continuous_scale='Greens',
+                            template="plotly_dark", aspect="auto")
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                              xaxis_type='category')
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Insufficient data for activity pulse heatmap.")
 
-                # Community Insights
-                if selected_user == 'Overall':
-                    st.write("Analyzing Community...")
-                    st.markdown("## 👥 Community Dynamics")
-                    x, new_df = helper.most_busy_users(df)
-                    colX, colY = st.columns([2, 1])
-                    
-                    with colX:
-                        fig = px.bar(x, x=x.index, y=x.values, 
-                                    title="Primary Contributors",
-                                    labels={'index': 'User', 'y': 'Total Messages'},
-                                    template="plotly_dark", color_discrete_sequence=['#25D366'])
-                        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                        st.plotly_chart(fig, use_container_width=True)
-                    with colY:
-                        st.markdown("#### Share of Voice (%)")
-                        st.dataframe(new_df, use_container_width=True, hide_index=True)
-                    
+        # 4. Community Insights
+        if selected_user == 'Overall':
+            st.markdown("## 👥 Community Dynamics")
+            x, new_df = helper.most_busy_users(df)
+            colX, colY = st.columns([2, 1])
+            
+            with colX:
+                st.markdown('<div class="saas-card">', unsafe_allow_html=True)
+                fig = px.bar(x, x=x.index, y=x.values, 
+                            title="Primary Contributors",
+                            labels={'index': 'User', 'y': 'Messages'},
+                            template="plotly_dark", color_discrete_sequence=['#22c55e'])
+                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+            with colY:
+                st.markdown('<div class="saas-card"><h4>Share of Voice (%)</h4>', unsafe_allow_html=True)
+                st.dataframe(new_df, use_container_width=True, hide_index=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
-                # Content Analysis
-                st.write("Extracting Semantic Insights...")
-                st.markdown("## 🔤 Semantic Analysis")
-                colW1, colW2 = st.columns(2)
-                
-                with colW1:
-                    st.markdown("#### Word Sentiment Cloud")
-                    df_wc = helper.create_wordcloud(selected_user, df)
-                    if df_wc:
-                        import matplotlib.pyplot as plt
-                        fig, ax = plt.subplots(facecolor='none')
-                        ax.imshow(df_wc)
-                        ax.axis('off')
-                        st.pyplot(fig)
-                    else:
-                        st.info("No lexical content available for wordcloud.")
-                    
-                with colW2:
-                    st.markdown("#### Lexical Trends")
-                    most_common_df = helper.most_common_words(selected_user, df)
-                    if not most_common_df.empty:
-                        fig = px.bar(most_common_df, x=1, y=0, orientation='h',
-                                    labels={'0': 'Term', '1': 'Count'},
-                                    template="plotly_dark", color_discrete_sequence=['#25D366'])
-                        fig.update_layout(yaxis={'categoryorder':'total ascending'},
-                                          plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                        st.plotly_chart(fig, use_container_width=True)
-                    else:
-                        st.info("No common words detected.")
-                
+        # 5. Semantic Analysis
+        st.markdown("## 🔤 Semantic Analysis")
+        colW1, colW2 = st.columns(2)
+        
+        with colW1:
+            st.markdown('<div class="saas-card"><h4>Word Sentiment Cloud</h4>', unsafe_allow_html=True)
+            df_wc = helper.create_wordcloud(selected_user, df)
+            if df_wc:
+                import matplotlib.pyplot as plt
+                fig, ax = plt.subplots(facecolor='none', figsize=(10, 10))
+                ax.imshow(df_wc, interpolation='bilinear')
+                ax.axis('off')
+                st.pyplot(fig)
+            else:
+                st.info("No lexical content available for wordcloud.")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+        with colW2:
+            st.markdown('<div class="saas-card"><h4>Lexical Trends</h4>', unsafe_allow_html=True)
+            most_common_df = helper.most_common_words(selected_user, df)
+            if not most_common_df.empty:
+                fig = px.bar(most_common_df, x=1, y=0, orientation='h',
+                            labels={'0': 'Term', '1': 'Count'},
+                            template="plotly_dark", color_discrete_sequence=['#22c55e'])
+                fig.update_layout(yaxis={'categoryorder':'total ascending'},
+                                  plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                                  xaxis_title="", yaxis_title="")
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No common words detected.")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-                # Emoji Analysis
-                st.write("Capturing Emotional Pulse...")
-                st.markdown("## 😂 Emotional Pulse")
-                emoji_df = helper.emoji_helper(selected_user, df)
-                
-                if not emoji_df.empty:
-                    colE1, colE2 = st.columns([1, 2])
-                    with colE1:
-                        st.dataframe(emoji_df.rename(columns={0: 'Emoji', 1: 'Frequency'}), 
-                                     use_container_width=True, hide_index=True)
-                    with colE2:
-                        fig = px.pie(emoji_df.head(10), values=1, names=0, 
-                                    title="Top 10 Emotional Triggers",
-                                    template="plotly_dark", hole=0.5,
-                                    color_discrete_sequence=px.colors.sequential.Greens_r)
-                        st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("No lexical emotions (emojis) detected.")
-                
-                
-                status.update(label="Dashboard Generated Successfully!", state="complete")
+        # 6. Emoji Analysis
+        st.markdown("## 😂 Emotional Pulse")
+        emoji_df = helper.emoji_helper(selected_user, df)
+        
+        if not emoji_df.empty:
+            colE1, colE2 = st.columns([1, 2])
+            with colE1:
+                st.markdown('<div class="saas-card">', unsafe_allow_html=True)
+                st.dataframe(emoji_df.rename(columns={0: 'Emoji', 1: 'Freq'}), 
+                             use_container_width=True, hide_index=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+            with colE2:
+                st.markdown('<div class="saas-card">', unsafe_allow_html=True)
+                fig = px.pie(emoji_df.head(10), values=1, names=0, 
+                            title="Top Emotional Triggers",
+                            template="plotly_dark", hole=0.6,
+                            color_discrete_sequence=px.colors.sequential.Greens_r)
+                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.info("No lexical emotions (emojis) detected.")
 
-        except Exception as e:
-            st.error("### ⚠️ Unexpected Error")
-            st.info("The application encountered a problem while analyzing this specific chat segment.")
-            st.markdown(f"**Error Details:** `{str(e)}`")
-            if st.button("Retry Analysis"):
-                st.rerun()
+    except Exception as e:
+        st.error(f"### ⚠️ Analysis Interrupted: {str(e)}")
+        if st.button("Retry Analysis"): st.rerun()
 
 else:
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if LOTTIE_AVAILABLE and lottie_chat:
-            try:
-                st_lottie(lottie_chat, height=300, key="chat_anim")
-            except:
-                st.markdown("""
-                <div style='text-align:center; padding: 2rem; border-radius: 20px; background: rgba(34, 197, 94, 0.05); margin-bottom: 2rem;'>
-                    <div style='font-size: 80px; filter: drop-shadow(0 0 15px var(--primary));'>💬</div>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div style='text-align:center; padding: 2rem; border-radius: 20px; background: rgba(34, 197, 94, 0.1); margin-bottom: 2rem;'>
-                <div style='font-size: 80px;'>📊</div>
-            </div>
-            """, unsafe_allow_html=True)
-        st.markdown("<h1 style='text-align: center;'>Ready to Pulse?</h1>", unsafe_allow_html=True)
-        st.markdown("""
-        <div style="text-align: center;">
-            <p>Export your WhatsApp chat (without media) and upload to begin professional analysis.</p>
-            <p style="color: grey; font-size: 14px;">Privacy first: Data is processed locally in your session.</p>
+    # Landing Page - Visual Hero
+    st.markdown("""
+    <div class="hero-section animate-in">
+        <div style='font-size: 100px; margin-bottom: 20px; filter: drop-shadow(0 0 20px var(--primary-glow));'>📊</div>
+        <h1>Analyze Your Conversations</h1>
+        <p style='font-size: 18px; color: var(--text-medium); max-width: 600px; margin: 0 auto;'>
+            Unlock deep insights from your WhatsApp chats with professional-grade analytics and visual trends.
+        </p>
+        <div style='margin-top: 40px; padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);'>
+            <p style='color: var(--primary); font-weight: 600;'>🚀 Quick Start</p>
+            <p style='color: var(--text-muted); font-size: 14px;'>Use the sidebar to upload a chat (.txt) or try the sample data.</p>
         </div>
-        """, unsafe_allow_html=True)
+        <p style='margin-top: 60px; color: grey; font-size: 12px;'>Privacy Secured: Data is processed entirely in your local browser session.</p>
+    </div>
+    """, unsafe_allow_html=True)
